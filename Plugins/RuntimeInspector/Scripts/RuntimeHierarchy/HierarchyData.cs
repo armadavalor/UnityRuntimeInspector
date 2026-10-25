@@ -51,7 +51,28 @@ namespace RuntimeInspectorNamespace
 		protected int m_depth;
 		public int Depth { get { return m_depth; } }
 
-		public bool CanExpand { get { return ChildCount > 0; } }
+		public bool CanExpand
+		{
+			get
+			{
+				int childCount = ChildCount;
+				if( childCount == 0 )
+					return false;
+
+				// Don't show the expand arrow if all children are hidden by the GameObjectFilter
+				RuntimeHierarchy.GameObjectFilterDelegate filter = Root.Hierarchy.GameObjectFilter;
+				if( filter == null )
+					return true;
+
+				for( int i = 0; i < childCount; i++ )
+				{
+					if( filter( GetChild( i ) ) )
+						return true;
+				}
+
+				return false;
+			}
+		}
 		public bool IsExpanded
 		{
 			get { return children != null; }
